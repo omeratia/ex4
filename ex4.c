@@ -9,6 +9,8 @@ Assignment:
 #define ZERO 0
 #define ADJUST_ONE 1
 #define PYRAMID_SIZE 5
+#define ASCII_SIZE 128
+#define QUEEN_SIZE 20
 
 void task1_robot_paths(int column, int row);
 int robotRecursion(int column, int row);
@@ -20,7 +22,21 @@ int findClosing(char opener);
 int isOpen(char c);
 int isClosing(char c);
 int pairChecker(char opener, char closer);
-void task4_queens_battle();
+void task4_queens_battle(int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+void markQueen(int y, int x,
+                int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int check(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],int regions[ASCII_SIZE],char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int diagonalChecker(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE], int boardSize);
 void task5_crossword_generator();
 
 int main()
@@ -28,6 +44,13 @@ int main()
     int task = -1;
     int robotCol, robotRow; //variables for inputs for first task
     float weights[PYRAMID_SIZE][PYRAMID_SIZE]; //2D array to keep our dancers weights
+
+    //for task 4:
+    int regions[ASCII_SIZE]={0};
+    int queenRows[QUEEN_SIZE] = {0};
+    int queenColumns[QUEEN_SIZE]={0};
+    char regionsBoard[QUEEN_SIZE][QUEEN_SIZE];
+    char queenBoard[QUEEN_SIZE][QUEEN_SIZE];
     
 
     do
@@ -59,7 +82,7 @@ int main()
                 task3_parenthesis_validator();
                 break;
             case 4:
-                task4_queens_battle();
+                task4_queens_battle(regions,queenRows,queenColumns,regionsBoard,queenBoard);
                 break;
             case 5:
                 task5_crossword_generator();
@@ -210,11 +233,129 @@ int pairChecker(char opener, char closer){
     else return 0;
 }
 
-void task4_queens_battle()
-{
-    // Todo
+void task4_queens_battle(int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+    int boardSize;
+    printf("Please enter the board dimensions:\n");
+    scanf("%d", &boardSize);
+    printf("Please enter the %d*%d puzzle board\n", boardSize, boardSize);
+    for (int i=0;i<boardSize;i++){
+        for (int j=0; j<boardSize;j++){
+            scanf(" %c", &regionsBoard[i][j]);
+        }
+    }
+
+    if (queenRec(0,0,regions,queenRows,queenColumns,regionsBoard,queenBoard,boardSize)){
+        printf("success for the queens\n");
+        for (int i=0; i<boardSize;i++){
+            for (int j=0; j<boardSize;j++){
+                if (queenBoard[i][j] != 'X'){
+                    printf("*");
+                    continue;
+                }
+                printf("%c", queenBoard[i][j]);
+            }
+            printf("\n");
+        };
+    }
+    else {
+        printf("no success\n");
+    }
+
+    
+
 }
 
+
+
+int check(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],int regions[ASCII_SIZE],char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+    char currentRegion = regionsBoard[y][x];
+    return (!queenRows[y] && !queenColumns[x] && !regions[currentRegion] && diagonalChecker(y,x,queenRows,queenColumns,queenBoard));
+}
+
+
+int diagonalChecker(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+    //1 if not free
+    if (y==0 && x==0){
+        return !(queenBoard[y][x] == 'X');
+    }
+    else if (x==0){
+        return !(queenBoard[y+1][x-1]=='X' || queenBoard[y+1][x+1]=='X');
+    }
+    else if (y==0){
+        return !(queenBoard[y-1][x+1]=='X' || queenBoard[y+1][x+1]=='X');
+    }
+    else {
+        return !(queenBoard[y-1][x+1]=='X' || queenBoard[y+1][x+1]=='X' || queenBoard[y-1][x-1]=='X' || queenBoard[y+1][x-1]=='X');
+    }
+}
+
+void markQueen(int y, int x,
+                int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+
+                    queenColumns[x] = 1;
+                    queenRows[y] = 1;
+                    char currentRegion = regionsBoard[y][x];
+                    regions[currentRegion] = 1;
+                    queenBoard[y][x] = 'X';
+                    printf("marking queen at %d,%d on region %c\n", y,x,currentRegion);
+};
+
+void unmarkQueen(int y, int x,
+                int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+
+                    queenColumns[x] = 0;
+                    queenRows[y] = 0;
+                    char currentRegion = regionsBoard[y][x];
+                    regions[currentRegion] = 0;
+                    queenBoard[y][x] = '*';
+                    printf("unmarking queen at %d,%d on region %c\n", y,x,currentRegion);
+                }
+
+
+int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE], int boardSize){
+            if (y == boardSize && queenRows[y-1]){
+                printf("y got to the boardSize, returning 1\n");
+                return 1;
+            }
+            else if (x == boardSize){
+                printf("x got to the boardSize, returning 0\n");
+                return 0;
+            }
+
+
+            if (check(y,x,queenRows,queenColumns,regions,regionsBoard,queenBoard)){
+                printf("check for %d,%d was good!\n",y,x);
+                markQueen(y,x,regions,queenRows,queenColumns,regionsBoard,queenBoard);
+                
+                if (!(queenRec(y+1,0,regions,queenRows,queenColumns,regionsBoard,queenBoard,boardSize))){
+                    printf("queenRec at %d,%d failed\n",y+1,0);
+                    unmarkQueen(y,x,regions,queenRows,queenColumns,regionsBoard,queenBoard);
+                    printf("now trying queenRec with %d,%d\n", y,x+1);
+                    return queenRec(y,x+1,regions,queenRows,queenColumns,regionsBoard,queenBoard,boardSize);
+                }
+            }
+            
+            
+            else {
+                printf("check for %d,%d was bad\n", y, x);
+                return queenRec(y, x + 1, regions, queenRows, queenColumns, regionsBoard, queenBoard, boardSize);
+    };
+    return 1;
+                    
+}
 void task5_crossword_generator()
 {
     // Todo
