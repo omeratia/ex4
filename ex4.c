@@ -11,6 +11,23 @@ Assignment:
 #define PYRAMID_SIZE 5
 #define ASCII_SIZE 128
 #define QUEEN_SIZE 20
+#define WORD_SIZE 15
+#define CROSSWORD_SIZE 30
+#define SLOTS_SIZE 100
+
+typedef struct Slot {
+    int row; //row num
+    int column; // col num
+    char direction; // h or v
+    int length; // length of slot
+    int assignedWord; // will be initialzied as -1 and will be adjusted to a word index of the word that inhabits him
+    }Slot;
+
+typedef struct Word {
+    char letters[QUEEN_SIZE + ADJUST_ONE]; //max size+ one more char for the /0
+    int length;
+    int index;
+}Word;
 
 void task1_robot_paths(int column, int row);
 int robotRecursion(int column, int row);
@@ -22,22 +39,62 @@ int findClosing(char opener);
 int isOpen(char c);
 int isClosing(char c);
 int pairChecker(char opener, char closer);
-void task4_queens_battle(int regions[ASCII_SIZE],
-                int queenRows[QUEEN_SIZE],
-                int queenColumns[QUEEN_SIZE],
-                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
-                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+void task4_queens_battle();
 void markQueen(int y, int x,
                 int regions[ASCII_SIZE],
                 int queenRows[QUEEN_SIZE],
                 int queenColumns[QUEEN_SIZE],
                 char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
                 char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
-int check(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],int regions[ASCII_SIZE],char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
-int diagonalChecker(int y, int x, int queenRows[QUEEN_SIZE], int queenColumns[QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
-int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],int queenColumns[QUEEN_SIZE],
-                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE], int boardSize);
+void unmarkQueen(int y, int x,
+                int regions[ASCII_SIZE],
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int check(int y, int x, 
+                int queenRows[QUEEN_SIZE], 
+                int queenColumns[QUEEN_SIZE],
+                int regions[ASCII_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int diagonalChecker(int y, int x, 
+                int queenRows[QUEEN_SIZE], 
+                int queenColumns[QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]);
+int queenRec(int y, int x, int regions[ASCII_SIZE], 
+                int queenRows[QUEEN_SIZE],
+                int queenColumns[QUEEN_SIZE],
+                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
+                char queenBoard[QUEEN_SIZE][QUEEN_SIZE], 
+                int boardSize);
+//Case 5 functions:
 void task5_crossword_generator();
+int verticalCompare(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index,int row,int column);
+int horizonCompare(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index,int row,int column);
+int comparison(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index);
+int canWordFitSlot(Word word, Slot slot, int usedWords[SLOTS_SIZE],char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE]);
+void insertWordHorizon(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+void insertWordVert(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+void insertWord(Slot slots[SLOTS_SIZE], int slotIndex, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+void removeWordVert(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+void removeWordHorizon(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+void removeWord(Slot slots[SLOTS_SIZE],int slotIndex, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]);
+int crosswordRec(Slot slots[SLOTS_SIZE],
+                 Word words[SLOTS_SIZE], 
+                 char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],
+                 int usedWords[SLOTS_SIZE], 
+                 int slotIndex, 
+                 int wordIndex, 
+                 int numOfSlots, 
+                 int numOfWords);
+void reinsertWords(Slot slots[SLOTS_SIZE],
+                 Word words[SLOTS_SIZE], 
+                 char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],
+                 int usedWords[SLOTS_SIZE], 
+                 int currentSlot,
+                 int index);
+
 
 int main()
 {
@@ -45,12 +102,10 @@ int main()
     int robotCol, robotRow; //variables for inputs for first task
     float weights[PYRAMID_SIZE][PYRAMID_SIZE]; //2D array to keep our dancers weights
 
-    //for task 4:
-    int regions[ASCII_SIZE]={0};
-    int queenRows[QUEEN_SIZE] = {0};
-    int queenColumns[QUEEN_SIZE]={0};
-    char regionsBoard[QUEEN_SIZE][QUEEN_SIZE];
-    char queenBoard[QUEEN_SIZE][QUEEN_SIZE];
+    
+    
+    
+    
     
 
     do
@@ -80,9 +135,11 @@ int main()
                 break;
             case 3:
                 task3_parenthesis_validator();
+                // scanf("%*[^\n]");
                 break;
             case 4:
-                task4_queens_battle(regions,queenRows,queenColumns,regionsBoard,queenBoard);
+                {
+                task4_queens_battle();}
                 break;
             case 5:
                 task5_crossword_generator();
@@ -131,19 +188,24 @@ int robotRecursion(int column, int row){
 
 void task2_human_pyramid(float weights[PYRAMID_SIZE][PYRAMID_SIZE], int pyramidSize){
     printf("Please enter the weights of the cheerleaders:\n");
+    //using loop to get inputs
     for (int i=0;i<pyramidSize;i++){
         for (int j=0; j<=i;j++){
             float weightInput;
             scanf("%f", &weightInput);
             if (weightInput<0){
+                //breaking the task if the user entered negative weight
                 printf("Negative weights are not supported.\n");
                 return;
             }
+            //adding each weight to our 2D array: at top (first row) we have the sole upper dancer,
+            //and so go on each row has the number of her index as the number of dancers
             weights[i][j] = weightInput;
         }
     }
 
     for (int i=0;i<pyramidSize;i++){
+        //implementing the recurrsion to each dancer according to his position
         for (int j=0;j<=i;j++){
             float weightLoad = pyramidRecursion(weights, i, j);
             printf("%.2f ",weightLoad);
@@ -153,11 +215,15 @@ void task2_human_pyramid(float weights[PYRAMID_SIZE][PYRAMID_SIZE], int pyramidS
 }
 
 float pyramidRecursion(float weights[PYRAMID_SIZE][PYRAMID_SIZE], int row, int column){
+    //our stop conditions as follow: either go out of bounds (to the negative size) or if the row is bigger 
+    //than the column, which should never happen beacuse we moving up and to the left.
     if (row < 0 || column < 0 || row<column){
         return 0;
     }
+    //each dancer would return its own weight and half of each of one of the dacner above her's weight. 
+    //the recurrsion always check the dancer right above you and the dancer above and left to you.
     return weights[row][column] + 
-            0.5*pyramidRecursion(weights, row-1, column-1) + 0.5*pyramidRecursion(weights, row-1,column);
+            0.5000005*pyramidRecursion(weights, row-1, column-1) + 0.5000005*pyramidRecursion(weights, row-1,column);
 }
 
 void task3_parenthesis_validator()
@@ -170,7 +236,9 @@ void task3_parenthesis_validator()
         printf("The parentheses are balanced correctly.\n");
     }
     else {
+        
         printf("The parentheses are not balanced correctly\n");
+        
     }
 }
 
@@ -184,6 +252,7 @@ int termValidation(){
         return findClosing(c) && termValidation();
     }
     if (isClosing(c)){
+        // scanf("%*[^\n]");
         return 0;
     }
     return termValidation();
@@ -200,7 +269,7 @@ int findClosing(char opener){
         return pairChecker(opener, c1);
     }
     else if (isOpen(c1)){
-        findClosing(c1);
+        return findClosing(c1) && findClosing(opener);
     }
     return findClosing(opener);
 }
@@ -230,14 +299,16 @@ int pairChecker(char opener, char closer){
     else if (opener == '<' && closer == '>'){
         return 1;
     }
-    else return 0;
+    else {
+        return 0;}
 }
 
-void task4_queens_battle(int regions[ASCII_SIZE],
-                int queenRows[QUEEN_SIZE],
-                int queenColumns[QUEEN_SIZE],
-                char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],
-                char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
+void task4_queens_battle(){
+    int regions[ASCII_SIZE]={0};
+    int queenRows[QUEEN_SIZE] = {0};
+    int queenColumns[QUEEN_SIZE]={0};
+    char regionsBoard[QUEEN_SIZE][QUEEN_SIZE];
+    char queenBoard[QUEEN_SIZE][QUEEN_SIZE];
     int boardSize;
     printf("Please enter the board dimensions:\n");
     scanf("%d", &boardSize);
@@ -323,7 +394,6 @@ void unmarkQueen(int y, int x,
                     printf("unmarking queen at %d,%d on region %c\n", y,x,currentRegion);
                 }
 
-
 int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],int queenColumns[QUEEN_SIZE],
                 char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE], int boardSize){
             if (y == boardSize && queenRows[y-1]){
@@ -356,7 +426,289 @@ int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],in
     return 1;
                     
 }
-void task5_crossword_generator()
-{
-    // Todo
+void task5_crossword_generator(){
+    char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE]={0};
+    Slot slots[SLOTS_SIZE];
+    Word words[SLOTS_SIZE];
+    int usedWords[SLOTS_SIZE] = {0};
+    int gridSize, numOfSlots, numOfWords;
+    printf("Please enter the dimensions of the crossword grid:\n");
+    scanf("%d",&gridSize);
+    printf("Please enter the number of slots in the crossword:\n");
+    scanf("%d",&numOfSlots);
+    printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
+    for (int i=0; i<numOfSlots;i++){
+        int row,column,length;
+        char direction;
+        scanf(" %d %d %d %c", &row, &column, &length, &direction);
+        slots[i].row = row;
+        slots[i].column = column;
+        slots[i].length = length;
+        slots[i].direction = direction;
+        slots[i].assignedWord = -1;
+    };
+    printf("Please enter the number of words in the dictionary:\n");
+    scanf("%d",&numOfWords);
+    while (numOfWords<numOfSlots){
+        printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n", numOfSlots);
+        scanf("%d",&numOfWords);
+    };
+    printf("Please enter words for the dictionary:\n");
+    for (int i=0;i<numOfWords;i++){
+        char word[WORD_SIZE];
+        scanf("%s",word);
+        words[i].index = i;
+        int length = strlen(word);
+        words[i].length = length;
+        strcpy(words[i].letters, word);
+    };
+
+    if (crosswordRec(slots,words,crossword,usedWords,0,0,numOfSlots,numOfWords)){
+        for (int i=0;i<gridSize;i++){
+            for (int j=0; j<gridSize;j++){
+                printf("| ");
+                if (crossword[i][j] == '\0'){
+                    printf("# ");
+                }
+                else {
+                    printf("%c ",crossword[i][j]);
+                }
+                printf("| ");
+            }
+            printf("\n");
+        }
+    }
+    else {
+        printf("No success for crossword\n");
+    }
+
 }
+
+int crosswordRec(Slot slots[SLOTS_SIZE],
+                 Word words[SLOTS_SIZE], 
+                 char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],
+                 int usedWords[SLOTS_SIZE], 
+                 int slotIndex, 
+                 int wordIndex, 
+                 int numOfSlots, 
+                 int numOfWords) 
+{
+    if (slotIndex == numOfSlots) {
+        printf("slotIndex got to numOfSlots, returning 1!!\n");
+        return 1;
+        
+    };
+
+    if (wordIndex >= numOfWords) {//
+        return 0;
+        printf("No more words to try for slot %d. Backtracking...\n", slotIndex);
+    };
+
+    if (canWordFitSlot(words[wordIndex], slots[slotIndex], usedWords, crossword)) {
+        printf("word %s can fit slot %d\n",words[wordIndex].letters, slotIndex);
+        insertWord(slots,
+                    slotIndex, 
+                   words[wordIndex],
+                   crossword, 
+                   0, 
+                   slots[slotIndex].row, 
+                   slots[slotIndex].column, 
+                   usedWords);
+        if (crosswordRec(slots, words, crossword, usedWords, slotIndex + ADJUST_ONE, 0, numOfSlots, numOfWords)) {
+            return 1;
+        //     printf("Slot %d didn't find a word\n", slotIndex + ADJUST_ONE);
+        //     int lastInsertedWord = slots[slotIndex].assignedWord;
+        //     printf("Removing word %s from slot %d\n", words[wordIndex].letters, slotIndex);
+        //     removeWord(slots[slotIndex], words[wordIndex], crossword, 0, slots[slotIndex].row, slots[slotIndex].column, usedWords);
+        //     printf("Now trying recursion for slot %d starting from the word %s\n", slotIndex, words[lastInsertedWord + ADJUST_ONE].letters);
+        //     return crosswordRec(slots, words, crossword, usedWords, slotIndex, lastInsertedWord + ADJUST_ONE, numOfSlots, numOfWords);
+        // }
+    } 
+        printf("Slot %d didn't find a word\n", slotIndex);
+        removeWord(slots,slotIndex, words[wordIndex], crossword, 0, slots[slotIndex].row, slots[slotIndex].column, usedWords);
+        printf("Reinserting words after removing slot %d\n", slotIndex);
+        reinsertWords(slots,words,crossword,usedWords,slotIndex,0);
+    }
+    
+    printf("Doing recursion for slot %d starting with word %s\n", slotIndex, words[wordIndex + ADJUST_ONE].letters);
+    return crosswordRec(slots, words, crossword, usedWords, slotIndex, wordIndex + ADJUST_ONE, numOfSlots, numOfWords);
+
+    
+};
+
+int canWordFitSlot(Word word, Slot slot, int usedWords[SLOTS_SIZE],char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE]){
+    //if this specific word is already taken we cut the loop  
+    if (usedWords[word.index]){
+        return 0;
+    }
+    //if the lengths are not matching we are cutting the loop
+    else if (slot.length != word.length){
+        return 0;
+    }
+    //checking if we already have letters in the slot and that they are matching our current word
+    else if (!comparison(word,slot,crossword,0)){
+        return 0;
+    }
+    return 1;
+}
+
+int comparison(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index){
+    //this function redirectes to the right comparison function, depends on the direction of the slot 
+    int row = slot.row;
+    int column = slot.column;
+    if (slot.direction == 'H'){
+        return horizonCompare(word, slot, crossword, index,row,column);
+    };
+    return verticalCompare(word,slot,crossword,index,row, column);
+};
+
+int horizonCompare(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index,int row,int column){
+    //if the index aka the steps we checked got over the word length it means we checked all the
+    //char slots for the word and they available or matching it
+    if (index>word.length){
+        return 1;
+    };
+    //if we have a 0 in the frid it means the space is available and we shall move on to the next chat slot,
+    //moving by column becuase this is horizontal
+    if (crossword[row][column]== '\0'){
+        return horizonCompare(word, slot, crossword, index+ADJUST_ONE, row, column+ADJUST_ONE);
+    };
+    //if we got here it means there is a letter in the slot, and we need to check that it matches the current index
+    //letter in our word
+    if (crossword[row][column] != word.letters[index]){
+        return 0;
+    };
+    return 1;
+};
+
+int verticalCompare(Word word, Slot slot, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int index,int row,int column){
+    //if the index aka the steps we checked got over the word length it means we checked all the
+    //char slots for the word and they available or matching it
+    if (index>word.length){
+        return 1;
+    };
+    //if we have a 0 in the frid it means the space is available and we shall move on to the next chat slot,
+    //moving by row becuase this is vertical
+    if (crossword[row][column]== '\0'){
+        return verticalCompare(word, slot, crossword, index+ADJUST_ONE, row+ADJUST_ONE, column);
+    };
+    //if we got here it means there is a letter in the slot, and we need to check that it matches the current index
+    //letter in our word
+    if (crossword[row][column] != word.letters[index]){
+        return 0;
+    };
+    return 1;
+};
+
+void reinsertWords(Slot slots[SLOTS_SIZE],
+                 Word words[SLOTS_SIZE], 
+                 char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],
+                 int usedWords[SLOTS_SIZE], 
+                 int currentSlot,
+                 int index){
+    if (index>=currentSlot){
+        return;
+    };
+    printf("Processing slot %d, assignedWord: %d\n", index, slots[index].assignedWord);
+    if (slots[index].assignedWord>=ZERO){
+        Word assignedWord = words[slots[index].assignedWord];
+        printf("reinserting word: %s on slot %d\n",words[slots[index].assignedWord].letters,index);
+        insertWord(slots,index, assignedWord,crossword,ZERO,slots[index].row,slots[index].column,usedWords);
+        
+    };
+    reinsertWords(slots,words,crossword,usedWords,currentSlot,index+ADJUST_ONE);
+};
+
+void insertWord(Slot slots[SLOTS_SIZE],int slotIndex, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //function to redirect to the right inserting function depends on the direction of the slot
+    if (slots[slotIndex].direction == 'H'){
+        insertWordHorizon(slots[slotIndex],word,crossword,step,row,column,usedWords);
+    }
+    else {
+        insertWordVert(slots[slotIndex], word, crossword, step, row, column, usedWords);
+    }
+    usedWords[word.index] = 1;
+    slots[slotIndex].assignedWord= word.index;
+
+    printf("Inserted word: %s at [%d][%d]\n", word.letters, row, column);
+
+};
+
+void insertWordVert(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //if we did number of steps as the length of the word, it means we inserted all letters to the slot and we can
+    //end the function. also we will insert 1 in the usedWords array so we will know this word is taken,
+    //and add the index of the word to its matching slot
+    if (step == word.length){
+        usedWords[word.index] =1;
+        return;
+    }
+    //inserting our letter to the slot
+    crossword[row][column] = word.letters[step];
+    //moving the recurssion to next word, vertically
+    insertWordVert(slot,word,crossword,step+ADJUST_ONE,row+ADJUST_ONE,column,usedWords);
+};
+
+void insertWordHorizon(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //if we did number of steps as the length of the word, it means we inserted all letters to the slot and we can
+    //end the function. also we will insert 1 in the usedWords array so we will know this word is taken
+    if (step == word.length){
+        usedWords[word.index] =1;
+        slot.assignedWord = word.index;
+        return;
+    }
+    //inserting our letter to the slot
+    crossword[row][column] = word.letters[step];
+    //moving the recurssion to next word, vertically, incrementing our step count
+    insertWordHorizon(slot,word,crossword,step+ADJUST_ONE,row,column+ADJUST_ONE,usedWords);
+};
+
+void removeWord(Slot slots[SLOTS_SIZE], int slotIndex, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //function to redirect to the right removing function depends on the direction of the slot
+    if (slots[slotIndex].direction == 'H'){
+        removeWordHorizon(slots[slotIndex],word,crossword,step,row,column,usedWords);
+    }
+     else {
+        removeWordVert(slots[slotIndex], word, crossword, step, row, column, usedWords);
+    }
+
+    
+    usedWords[word.index] = 0;
+    slots[slotIndex].assignedWord = -1;
+
+    printf("Removed word: %s from [%d][%d], slot assignedWord cleared\n", word.letters, row, column);
+}
+
+void removeWordHorizon(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //if we did number of steps as the length of the word, it means we removed all letters from the slot and we can
+    //end the function. also we will insert 0 in the usedWords array so we will know this word is not taken anymore,
+    //and return the value of assigned word to be -1 as its not attached to this slot anymore
+    if (step == word.length){
+        usedWords[word.index] =0;
+        slot.assignedWord = -1;
+        return;
+    }
+    //returning to default value
+    crossword[row][column] = '\0';
+    //next stop in the recurrsion moving forward horizonally
+    removeWordHorizon(slot,word,crossword,step+ADJUST_ONE,row,column+ADJUST_ONE,usedWords);
+};
+
+void removeWordVert(Slot slot, Word word, char crossword[CROSSWORD_SIZE][CROSSWORD_SIZE],int step,int row,int column, int usedWords[SLOTS_SIZE]){
+    //if we did number of steps as the length of the word, it means we removed all letters from the slot and we can
+    //end the function. also we will insert 0 in the usedWords array so we will know this word is not taken anymore
+    //and return the value of assigned word to be -1 as its not attached to this slot anymore
+    if (step == word.length){
+        usedWords[word.index] =0;
+        slot.assignedWord = -1;
+        return;
+    }
+    //returning to default value
+    crossword[row][column] = '\0';
+    //next step at the recurrsion moving down the rows vertically
+    removeWordVert(slot,word,crossword,step+ADJUST_ONE,row+ADJUST_ONE,column,usedWords);
+};
+
+
+
+
+

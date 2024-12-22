@@ -1,0 +1,24 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/omeratia/Desktop/CS/ex/ex4/ex4'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000276C, symSize: 0x1D4 }
+  - { offsetInCU: 0x41, offset: 0x41, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x10000276C, symSize: 0x1D4 }
+  - { offsetInCU: 0xDF, offset: 0xDF, size: 0x8, addend: 0x0, symName: _task1_robot_paths, symObjAddr: 0x1EC, symBinAddr: 0x100002958, symSize: 0x88 }
+  - { offsetInCU: 0x11F, offset: 0x11F, size: 0x8, addend: 0x0, symName: _task2_human_pyramid, symObjAddr: 0x274, symBinAddr: 0x1000029E0, symSize: 0x194 }
+  - { offsetInCU: 0x1F9, offset: 0x1F9, size: 0x8, addend: 0x0, symName: _task4_queens_battle, symObjAddr: 0x408, symBinAddr: 0x100002B74, symSize: 0x248 }
+  - { offsetInCU: 0x2D5, offset: 0x2D5, size: 0x8, addend: 0x0, symName: _robotRecursion, symObjAddr: 0x650, symBinAddr: 0x100002DBC, symSize: 0xC4 }
+  - { offsetInCU: 0x30B, offset: 0x30B, size: 0x8, addend: 0x0, symName: _pyramidRecursion, symObjAddr: 0x714, symBinAddr: 0x100002E80, symSize: 0xFC }
+  - { offsetInCU: 0x34F, offset: 0x34F, size: 0x8, addend: 0x0, symName: _task3_parenthesis_validator, symObjAddr: 0x810, symBinAddr: 0x100002F7C, symSize: 0x80 }
+  - { offsetInCU: 0x364, offset: 0x364, size: 0x8, addend: 0x0, symName: _termValidation, symObjAddr: 0x890, symBinAddr: 0x100002FFC, symSize: 0xDC }
+  - { offsetInCU: 0x38C, offset: 0x38C, size: 0x8, addend: 0x0, symName: _isOpen, symObjAddr: 0x96C, symBinAddr: 0x1000030D8, symSize: 0x78 }
+  - { offsetInCU: 0x3B4, offset: 0x3B4, size: 0x8, addend: 0x0, symName: _findClosing, symObjAddr: 0x9E4, symBinAddr: 0x100003150, symSize: 0xF8 }
+  - { offsetInCU: 0x3EA, offset: 0x3EA, size: 0x8, addend: 0x0, symName: _isClosing, symObjAddr: 0xADC, symBinAddr: 0x100003248, symSize: 0x78 }
+  - { offsetInCU: 0x412, offset: 0x412, size: 0x8, addend: 0x0, symName: _pairChecker, symObjAddr: 0xB54, symBinAddr: 0x1000032C0, symSize: 0xF0 }
+  - { offsetInCU: 0x448, offset: 0x448, size: 0x8, addend: 0x0, symName: _queenRec, symObjAddr: 0xC44, symBinAddr: 0x1000033B0, symSize: 0x274 }
+  - { offsetInCU: 0x4DB, offset: 0x4DB, size: 0x8, addend: 0x0, symName: _check, symObjAddr: 0xEB8, symBinAddr: 0x100003624, symSize: 0xF4 }
+  - { offsetInCU: 0x56E, offset: 0x56E, size: 0x8, addend: 0x0, symName: _diagonalChecker, symObjAddr: 0xFAC, symBinAddr: 0x100003718, symSize: 0x288 }
+  - { offsetInCU: 0x5D4, offset: 0x5D4, size: 0x8, addend: 0x0, symName: _markQueen, symObjAddr: 0x1234, symBinAddr: 0x1000039A0, symSize: 0xD4 }
+  - { offsetInCU: 0x663, offset: 0x663, size: 0x8, addend: 0x0, symName: _unmarkQueen, symObjAddr: 0x1308, symBinAddr: 0x100003A74, symSize: 0xD4 }
+  - { offsetInCU: 0x6F2, offset: 0x6F2, size: 0x8, addend: 0x0, symName: _task5_crossword_generator, symObjAddr: 0x13DC, symBinAddr: 0x100003B48, symSize: 0x4 }
+...
