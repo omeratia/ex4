@@ -243,7 +243,7 @@ void task3_parenthesis_validator()
     scanf("%*c");
     printf("Please enter a term for validation:\n");
     //recieving input until enter is being pressed
-    scanf("[^\n]");
+    // scanf("[^\n]");
     if (termValidation()){
         printf("The parentheses are balanced correctly.\n");
     }
@@ -326,6 +326,7 @@ int pairChecker(char opener, char closer){
         return 1;
     }
     else {
+        scanf("%*[^ \n]");
         return 0;}
 }
 
