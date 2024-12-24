@@ -8,10 +8,12 @@ Assignment:
 
 #define ZERO 0
 #define ADJUST_ONE 1
+#define THREE 3
 #define PYRAMID_SIZE 5
+#define HALF_SPECIFIER 0.5000005
 #define ASCII_SIZE 128
 #define QUEEN_SIZE 20
-#define WORD_SIZE 15
+#define WORD_SIZE 16
 #define CROSSWORD_SIZE 30
 #define SLOTS_SIZE 100
 
@@ -210,6 +212,7 @@ void task2_human_pyramid(float weights[PYRAMID_SIZE][PYRAMID_SIZE], int pyramidS
             weights[i][j] = weightInput;
         }
     }
+    printf("The total weight on each cheerleader is:\n");
 
     for (int i=0;i<pyramidSize;i++){
         //implementing the recurrsion to each dancer according to his position
@@ -230,12 +233,13 @@ float pyramidRecursion(float weights[PYRAMID_SIZE][PYRAMID_SIZE], int row, int c
     //each dancer would return its own weight and half of each of one of the dacner above her's weight. 
     //the recurrsion always check the dancer right above you and the dancer above and left to you.
     return weights[row][column] + 
-            0.5000005*pyramidRecursion(weights, row-1, column-1) + 0.5000005*pyramidRecursion(weights, row-1,column);
+            HALF_SPECIFIER*pyramidRecursion(weights, row-1, column-1) + 
+            HALF_SPECIFIER*pyramidRecursion(weights, row-1,column);
 }
 
 void task3_parenthesis_validator()
 {
-    scanf("%*[^\n]");
+    scanf("%*[^ \n]");
     scanf("%*c");
     printf("Please enter a term for validation:\n");
     //recieving input until enter is being pressed
@@ -244,8 +248,7 @@ void task3_parenthesis_validator()
         printf("The parentheses are balanced correctly.\n");
     }
     else {
-        
-        printf("The parentheses are not balanced correctly\n");
+        printf("The parentheses are not balanced correctly.\n");
         
     }
 }
@@ -266,7 +269,7 @@ int termValidation(){
     //if its a closer we are sending 0, because according to our code logic we are not suppose to find closers here,
     //only openers
     if (isClosing(c)){
-        // scanf("%*[^\n]");
+        scanf("%*[^ \n]");
         return 0;
     }
     //if we got here it means none of the stop conditions was applied, so we need to go on looking for openers 
@@ -336,7 +339,7 @@ void task4_queens_battle(){
     int boardSize;
     printf("Please enter the board dimensions:\n");
     scanf("%d", &boardSize); //user input for dimensions
-    printf("Please enter the %d*%d puzzle board\n", boardSize, boardSize);
+    printf("Please enter a %d*%d puzzle board:\n", boardSize, boardSize);
     //initiating the regions board from the users input
     for (int i=0;i<boardSize;i++){
         for (int j=0; j<boardSize;j++){
@@ -345,7 +348,7 @@ void task4_queens_battle(){
     }
     //initiating the recursion here, the returned value (1 or 0) will determine the output
     if (queenRec(0,0,regions,queenRows,queenColumns,regionsBoard,queenBoard,boardSize)){
-        printf("solution:\n");
+        printf("Solution:\n");
         for (int i=0; i<boardSize;i++){
             for (int j=0; j<boardSize;j++){
                //printing according our array and according to queen positions
@@ -394,7 +397,7 @@ int diagonalChecker(int y, int x,char queenBoard[QUEEN_SIZE][QUEEN_SIZE]){
     }
     //if our row is 0 we only have 2 specific diagonals to check
     else if (y==0){
-        return !(queenBoard[y-1][x+1]=='X' || queenBoard[y+1][x+1]=='X');
+        return !(queenBoard[y+1][x-1]=='X' || queenBoard[y+1][x+1]=='X');
     }
     //if we got here it means our position have 4 diagonals to check
     else {
@@ -442,12 +445,17 @@ void unmarkQueen(int y, int x,
 
 int queenRec(int y, int x, int regions[ASCII_SIZE], int queenRows[QUEEN_SIZE],int queenColumns[QUEEN_SIZE],
                 char regionsBoard[QUEEN_SIZE][QUEEN_SIZE],char queenBoard[QUEEN_SIZE][QUEEN_SIZE], int boardSize){
-            //stop condition number one: if we got over the board size by rows (because we are moving vertically),
+            //stop conidtion number one: any grid in size 3 or below won't have a sulotion(not possinble
+            //with the diagonals)
+            if (boardSize<=THREE){
+                return 0;
+            }
+            //stop condition number two: if we got over the board size by rows (because we are moving vertically),
             //it means we put a queen in each row, hence we completed the board with valid queen positions
             if (y == boardSize && queenRows[y-1]){
                 return 1;
             }
-            //stop condition number two: if we got out of bounds horizonally, it means we tried putting queen in 
+            //stop condition number three: if we got out of bounds horizonally, it means we tried putting queen in 
             //every tile in the row, which means we can positon a queen in this row and we need to backtrack 
             else if (x == boardSize){
                 return 0;
@@ -506,7 +514,7 @@ void task5_crossword_generator(){
         printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n", numOfSlots);
         scanf("%d",&numOfWords);
     };
-    printf("Please enter words for the dictionary:\n");
+    printf("Please enter the words for the dictionary:\n");
     //each word from the user input enters to the words array
     for (int i=0;i<numOfWords;i++){
         char word[WORD_SIZE];
@@ -521,8 +529,8 @@ void task5_crossword_generator(){
     if (crosswordRec(slots,words,crossword,usedWords,0,0,numOfSlots,numOfWords)){
         //if we got a solution to the crossword, we are printing the grid
         for (int i=0;i<gridSize;i++){
+            printf("| ");
             for (int j=0; j<gridSize;j++){
-                printf("| ");
                 if (crossword[i][j] == '\0'){
                     printf("# ");
                 }
@@ -535,7 +543,7 @@ void task5_crossword_generator(){
         }
     }
     else {
-        printf("No success for crossword\n");
+        printf("This crossword cannot be solved.\n");
     }
 
 }
